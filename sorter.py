@@ -84,12 +84,15 @@ def normalize(name):
 
 def sort_file(folder_name):
     path = Path(folder_name)
+    ignored_folders = ["video", "audio", "images", "documents", "archives"]
 
     if path.exists():
         if path.is_dir():
             items = path.glob("**/*")
 
             for item in items:
+                if item.is_dir() and item.name in ignored_folders:
+                    continue
                 try:
                     if item.suffix in [".mp4", ".avi", ".mov", ".mkv"]:
                         dir = path / "video"
@@ -118,13 +121,7 @@ def sort_file(folder_name):
                         dir.mkdir(parents=True, exist_ok=True)
                         shutil.unpack_archive(item, dir)
                         continue
-                    elif item.is_dir() and item.name not in [
-                        "video",
-                        "audio",
-                        "images",
-                        "documents",
-                        "archives",
-                    ]:
+                    elif item.is_dir() and item.name not in ignored_folders:
                         if not any(item.iterdir()):
                             item.rmdir()
                         else:
@@ -144,6 +141,7 @@ def sort_file(folder_name):
 
                     dir.mkdir(parents=True, exist_ok=True)
                     item.rename(dir / (normalize(item.stem) + item.suffix))
+
                 except PermissionError:
                     print(f"The file {item.name} is occupied by a program or process")
 
@@ -154,7 +152,7 @@ def sort_file(folder_name):
 
 
 def main():
-    folder_name = r"C:\Users\AndriiVlasiuk\Desktop"
+    folder_name = r"C:\Users\andrey.vlasiuk\Desktop"
     sort_file(folder_name=folder_name)
 
 
@@ -163,4 +161,4 @@ if __name__ == "__main__":
         folder_name = sys.argv[1]
         sort_file(folder_name)
     else:
-        main()
+        main() #++
