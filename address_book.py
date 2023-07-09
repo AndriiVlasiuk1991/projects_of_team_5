@@ -240,6 +240,9 @@ def next_birthday(days):
                 if (dt - datetime.now()).days <= days:
                     result.append(
                         f"{k}:{address_book.data[k].birthday.value}, {k}'s birthday through {(dt - datetime.now()).days} days!")
+            elif _.month == datetime.now().month and _.day == datetime.now().day:
+                result.append(
+                    f"{k}:{address_book.data[k].birthday.value}, {k}'s birthday today!")
             else:
                 if (dt - datetime.now()).days <= days:
                     result.append(
@@ -247,7 +250,6 @@ def next_birthday(days):
         return result
     else:
         return "The number of days must be greater than 0"
-
 
 def show_all_contacts():
     if not address_book.data:
