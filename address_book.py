@@ -27,8 +27,18 @@ class Phone(Field):
     @Field.value.setter
     def value(self, new_value):
         if not str(new_value).isdigit():
-            raise ValueError(
-                "Invalid phone number. Phone number must be numeric.")
+            raise ValueError("Invalid phone number. Phone number must be numeric.")
+
+
+class Email(Field):
+    @Field.value.setter
+    def value(self, new_value):
+        if "@" not in new_value:
+            raise ValueError("Invalid email address.")
+
+
+class Address(Field):
+    pass
 
 
 class Birthday(Field):
@@ -43,9 +53,11 @@ class Birthday(Field):
 
 
 class Record:
-    def __init__(self, name, birthday=None):
+    def __init__(self, name, address=None, birthday=None, email=None):
         self.name = Name(name)
+        self.address = Address(address)
         self.birthday = Birthday(birthday)
+        self.email = Email(email)
         self.phones = []
 
     def add_phone(self, phone):
@@ -59,20 +71,14 @@ class Record:
             if old_phone in str(phone.value):
                 self.phones[i] = Phone(new_phone)
 
-    def days_to_birthday(self):
-        if self.birthday.value:
-            today = datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)
-            next_birthday = datetime.strptime(
-                self.birthday.value, "%Y-%m-%d").replace(year=today.year)
-            if today > next_birthday:
-                next_birthday = next_birthday.replace(year=today.year + 1)
-            days_left = (next_birthday - today).days
-            return days_left
-
     def __str__(self):
         result = f"Name: {self.name}\n"
+        if self.address.value:
+            result += f"Address: {self.address}\n"
         if self.birthday.value:
             result += f"Birthday: {self.birthday}\n"
+        if self.email.value:
+            result += f"Email: {self.email}\n"
         if self.phones:
             result += "Phones:\n"
             for phone in self.phones:
@@ -110,6 +116,13 @@ class AddressBook:
                 if phone in str(p):
                     result.append(record)
                     break
+        return result
+
+    def search_by_address(self, address):
+        result = []
+        for record in self.data.values():
+            if address.lower() in record.address.value.lower():
+                result.append(record)
         return result
 
     def save_to_file(self, filename):
@@ -150,8 +163,8 @@ address_book = AddressBook()
 
 
 @input_error
-def add_contact(name, phone, birthday=None):
-    record = Record(name)
+def add_contact(name, phone, birthday=None, address=None, email=None):
+    record = Record(name, address, birthday, email)
     correct_phone = phone.replace("-", "").replace(" ", "")
     if len(correct_phone) == 13 and correct_phone.startswith("+380") and (all(not char. isalpha() for char in correct_phone[1:])):
         record.add_phone(correct_phone)
@@ -163,7 +176,7 @@ def add_contact(name, phone, birthday=None):
         except ValueError as e:
             return str(e)
     address_book.add_record(record)
-    return f"Contact '{name}' with phone '{correct_phone}' and birthday '{birthday}' has been added."
+    return f"Contact '{name}' with phone '{correct_phone}', birthday '{birthday}', address '{address}', and email '{email}' has been added."
 
 
 @input_error
@@ -238,7 +251,6 @@ def next_birthday(days):
     else:
         return "The number of days must be greater than 0"
 
-
 def show_all_contacts():
     if not address_book.data:
         return "The contact list is empty."
@@ -248,7 +260,7 @@ def show_all_contacts():
     return result
 
 
-command_text = 'Hello, Add, Change, Remove, Phone, Next birthday,Birthday list, Search, Show all, Good bye, Close or Exit'
+command_text = 'Hello, Add, Change, Remove, Phone, Next birthday, Birthday list, Search, Show all, Good bye, Close or Exit'
 
 
 def main():
@@ -262,15 +274,15 @@ def main():
             try:
                 name = str(input("Enter Name > "))
                 phone = input("Enter Phone > ")
-                birthday = input(
-                    "Enter Birthday in the format YYYY-MM-DD (optional) > ")
-                print(add_contact(name, phone, birthday))
+                birthday = input("Enter Birthday in the format YYYY-MM-DD (optional) > ")
+                address = input("Enter Address (optional) > ")
+                email = input("Enter Email (optional) > ")
+                print(add_contact(name, phone, birthday, address, email))
             except ValueError:
                 print("Invalid input. Name -> String. Phone -> Number")
         elif command == "change":
             try:
-                name, old_phone = input(
-                    "Enter Name and Old Phone > ").lower().split()
+                name, old_phone = input("Enter Name and Old Phone > ").lower().split()
                 new_phone = input("Enter New Phone > ")
                 print(change_phone(name, old_phone, new_phone))
             except ValueError:
@@ -292,12 +304,12 @@ def main():
             except ValueError:
                 print("The number of days must be an integer!")
         elif command == "search":
-            inp = input("Enter Name or Phone > ")
+            inp = input("Enter Name, Phone, or Address > ")
             contacts = []
             if inp.isdigit():
                 contacts = address_book.search_by_phone(inp)
             else:
-                contacts = address_book.search_by_name(inp)
+                contacts = address_book.search_by_name(inp) + address_book.search_by_address(inp)
             if contacts:
                 result = "Results:\n"
                 for record in contacts:
