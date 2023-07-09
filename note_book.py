@@ -2,6 +2,54 @@ from collections import UserDict
 from datetime import datetime
 import json
 import os
+import random
+
+def magic_8_ball():
+    responses = [
+        "Безперечно!",
+        "Так точно!",
+        "Вельми ймовірно",
+        "Можливо",
+        "Не можу вам сказати зараз",
+        "Спробуйте ще раз пізніше",
+        "Краще не розраховувати на це",
+        "Відповідь невизначена",
+        "Це малоймовірно",
+        "Ні, це неможливо",
+        "Духи говорять так!",
+        "Є сумніви",
+        "Думаю що ні",
+        "Шанси хороші",
+        "Духи говорять ні",
+        "Без сумнівів",
+        "Шансів мало",
+        "Звичайно, якщо хочеш стати пінгвіном.",
+        "Тільки якщо готовий танцювати під дощем.",
+        "Звичайно, але пам'ятай, що це не змінить твій настрій.",
+        "Запитай пізніше. Зараз я зайнята готуванням чарівного пирога.",
+        "Ймовірно так! Я бачила це в своєму кришталевому шарі. :-)",
+        "Ніколи не кажи ніколи. Хіба, що магічна куля принесе тобі піцу.",
+        "Чи не краще тобі поговорити з моїм колегою, Магічнимм Барменом? Він спеціаліст з усіх важливих справ.",
+        "Спитай у кішки. Вона знає багато секретів всесвіту.",
+        "Завжди пам'ятайте: краще питати дурні питання, ніж дурно відповідати на питання. Я готова відповісти на будь-яке!",
+        "Відповідь закодована в потоці нейронних синапсів... Але нажаль, у мене не залучення до інтернету.",
+        "Впевнена на 99,9%... але є ще цей 0,1%, коли всі правила перестають діяти.",
+        "Знаєте, іноді питання без відповідей - найцікавіші. Так, ваше питання може стати наступним кандидатом на цю нагороду!",
+        "Це випадково, але відповідь - так!",
+        "На жаль, магічна куля відпочиває на Гавайських островах, але я можу залишити тобі свої 27 смішних порад!",
+        "Ох, це складне питання. Магічна куля вирішила пожартувати - питай знову!",
+        "Не можу відповісти прямо зараз, я ще переглядаю ""Курс магічних відповідей для чайників"".",
+        "Погодься на піцу і пиво, і відповідь буде - так!",
+        "Запитання надто складне для магічної кулі, спробуй з кришталевим шаром.",
+        "Магічна куля бачить велике щастя у твоєму майбутньому - але не знає, чи це через відповідь на це питання.",
+        "Питання настільки хороше, що магічна куля вирішила сміятись і не відповідати.",
+        "Ні, але якщо принесеш мені каву, то можливо згодом зміню думку.",
+        "Зірки кажуть - можливо!",
+        "Зроби паузу, випий чашку гарячого шоколаду і подивись комедійний серіал - це теж розвага!",
+        "Магічна куля каже, що можливість бути в гарному настрої - це найкращий депозит, який можеш мати!"
+    ]
+    random.shuffle(responses)
+    return random.choice(responses)
 
 class CustomException(Exception):
     pass
@@ -33,10 +81,13 @@ def find_command(params):
         return "Enter a word to search"
     return "\n".join(f" {result}" for result in address_book.search_by_content(params))        
 
-def note_find(params):
+def note_find(params=''):
+
+    note_book.load_from_file()
+
     wordfind = ""
     if not params:
-        wordfind = input("Введіть слово пошуку: ")
+        wordfind = input("Введіть слово для пошуку (щоб шукати по тегам додайте # перед словом): ")
     else:
         wordfind = params
     if not wordfind:
@@ -49,7 +100,7 @@ def note_find(params):
         return "\n".join(f" {result}" for result in note_book.search_by_content(wordfind))        
 
 @input_error
-def note_add(params):
+def note_add(params=''):
     #list_param = params.split(' ')
     #if len(list_param) < 3:
     #        raise CustomException("Після команди через пробіл потрібно ввести назву замітки, теги та текст замітки")
@@ -57,6 +108,8 @@ def note_add(params):
     #name = list_param[0]
     #tags = list_param[1:len(list_param)-1]
     #text_note = list_param[len(list_param)-1]
+
+    note_book.load_from_file()
 
     name = input("Введіть назву нотатки: ")
     tags_text = input("Введіть теги через пробіл: ")
@@ -68,9 +121,35 @@ def note_add(params):
         record.add_tag(tag)
     if text_note:
         record.add_note(text_note)
+
+    note_book.save_to_file(os.path.join(os.getcwd(), "note_book.json"))
+    
     return f"Нотатка '{name}' успішно додана!"
 
-def note_show_all(params):
+def note_remove():
+    name = input("Введіть назву нотатки яку потрібно видалити: ")
+    if name == '':
+        print('Нічого не введено, видалення відхилено.')
+    else:    
+        #record = note_book.search_by_name(name)
+        #note_delet = str(record)
+        note_book.load_from_file()
+        note_book.remove_record(name)
+        note_book.save_to_file(os.path.join(os.getcwd(), "note_book.json"))
+        print(f"Нотатка '{name}' видалена!")
+
+def note_edite():    
+    name = input("Введіть назву нотатки яку потрібно відредагувати: ")
+    if name == '':
+        print('Нічого не введено, редагування відхилено.')
+    else:
+        note_book.load_from_file()
+        note_book.edite_record(name)
+        note_book.save_to_file(os.path.join(os.getcwd(), "note_book.json"))
+        print(f"Нотатка '{name}' відредагована!")    
+    
+def note_show_all(params=''):
+    note_book.load_from_file()
     return note_book.show_all_records()
 
 @input_error
@@ -117,6 +196,39 @@ class NoteBook(UserDict):
 
     def remove_record(self, name):
         del self.data[name]
+
+    def edite_record(self, text_name):
+        record = ''
+        for find_record in self.data.values():
+            if text_name.lower() in find_record.name.value.lower():
+                record = find_record
+                break
+        if not record:
+            print(f"Немає нотатки з назвою '{text_name}'.")
+            return
+
+        print('1 - Змінити назву\n2 - Видалити чи змінити тег\n3 - Замінити текст нотатки\n4 - Додати текст до нотатки')
+        commandNote = input('Оберіть команду: ')
+        if commandNote == '1':
+            NewName = input('Введіть нову назву нотатки: ')
+            record.add_name(NewName)
+        elif commandNote == '2':
+            text_mesage = 'Теги:'
+            for tag in record.tags:
+                text_mesage += ' ' + tag.value
+            print(text_mesage)
+            FindTag = input('Введіть назву тега який потрібно видалити чи змінити: ')
+            NewTag = input('Введіть нову назву тега щоб змінити або нічого щоб видалити: ')
+            if NewTag == '':
+                record.remove_tag(FindTag)
+            else:
+                record.edit_tag(FindTag, NewTag)
+        elif commandNote == '3':
+            add_text_note = input('Введіть новий текст нотатки: ')
+            record.add_note(add_text_note)
+        elif commandNote == '4':
+            add_text_note = input('Введіть текст який потрібно додати до тексту нотатки: ')
+            record.add_text_note(add_text_note)
 
     def search_record(self, search_criteria):
         for record in self.data.values():
@@ -194,6 +306,12 @@ class NoteBook(UserDict):
                     break
         return results
 
+    def search_by_name(self, search_string):
+        results = []
+        for record in self.data.values():
+            if search_string.lower() in record.name.value.lower():
+                return record
+
 
 class RecordNote:
     def __init__(self, name, text_note=None):
@@ -204,8 +322,14 @@ class RecordNote:
     def add_tag(self, tag):
         self.tags.append(Name(tag))
 
+    def add_text_note(self, add_text_note):
+        self.text_note = Name(''+str(self.text_note.value)+' '+add_text_note)
+
     def add_note(self, text_note):
         self.text_note = Name(text_note)
+        
+    def add_name(self, name):
+        self.name = Name(name)
         
     def remove_tag(self, tag):
         self.tags = [p for p in self.tags if p.value != tag]
