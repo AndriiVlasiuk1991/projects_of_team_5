@@ -31,7 +31,7 @@ def main():
             print('Команда невідома')
               
     elif command == '3':
-        folder_name = r"C:\Users\andrey.vlasiuk\Desktop"
+        folder_name = input('Введіть шлях до папки, в якій потрібно відсортувати файли: ')
         sort_file(folder_name=folder_name)
     else:
         pass

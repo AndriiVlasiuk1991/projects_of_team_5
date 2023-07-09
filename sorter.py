@@ -172,7 +172,7 @@ def count_files(count_list):
         else:
             index_count[index] = 1
 
-    print(f"Сортування файлів успішно завершено: ")
+    print(f"\nСортування файлів успішно завершено: \n")
 
     for index, count in index_count.items():
         if index in [".mp4", ".avi", ".mov", ".mkv"]:
@@ -198,14 +198,9 @@ def count_files(count_list):
         print(f'В папку "documents" переміщено: \n{count_documents}')
 
 
-
-
-
 def main():
     folder_name = r"C:\Users\andrey.vlasiuk\Desktop"
     sort_file(folder_name=folder_name)
-    # count_files(folder_name=folder_name, counting_folders=["video", "audio", "images", "documents", "archives"])
-
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:
