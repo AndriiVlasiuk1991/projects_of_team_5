@@ -1,5 +1,4 @@
 import sys
-import os
 from sorter import sort_file
 from note_book import magic_8_ball, note_add, note_find, note_show_all, note_remove, note_edite
 
@@ -31,8 +30,7 @@ def main():
             print('Команда невідома')
               
     elif command == '3':
-        folder_name = input('Введіть шлях до папки, в якій потрібно відсортувати файли: ')
-        sort_file(folder_name=folder_name)
+        sort_file()
     else:
         pass
 
@@ -41,6 +39,6 @@ def main():
 if __name__ == '__main__':
     if len(sys.argv) > 1:
         folder_name = sys.argv[1]
-        sort_file(folder_name)
+        main()
     else:
         main()

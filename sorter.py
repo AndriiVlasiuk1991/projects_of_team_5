@@ -82,80 +82,87 @@ def normalize(name):
     return finally_name
 
 
-def sort_file(folder_name):
-    path = Path(folder_name)
+def sort_file():
     count_list = []
     ignored_folders = ["video", "audio", "images", "documents", "archives"]
 
-    if path.exists():
-        if path.is_dir():
-            items = path.glob("**/*")
-            for item in items:
-                if any(part in str(item) for part in ignored_folders):
-                    continue
-                try:
-                    if item.suffix in [".mp4", ".avi", ".mov", ".mkv"]:
-                        dir = path / "video"
-                        count_list.append(item.suffix)
-                    elif item.suffix in [".mp3", ".ogg", ".wav", ".amr"]:
-                        dir = path / "audio"
-                        count_list.append(item.suffix)
-                    elif item.suffix in [
-                        ".jpg",
-                        ".jpeg",
-                        ".png",
-                        ".svg",
-                        ".snagx",
-                        ".gif",
-                    ]:
-                        dir = path / "images"
-                        count_list.append(item.suffix)
-                    elif item.suffix in [
-                        ".txt",
-                        ".doc",
-                        ".docx",
-                        ".pdf",
-                        ".xlsx",
-                        ".pptx",
-                    ]:
-                        dir = path / "documents"
-                        count_list.append(item.suffix)
-                    elif item.suffix in [".zip", ".gz", ".tar"]:
-                        dir = path / "archives" / item.stem
-                        count_list.append(item.suffix)
-                        dir.mkdir(parents=True, exist_ok=True)
-                        shutil.unpack_archive(item, dir)
+    while True:
+        folder_name = input('Введіть шлях до папки, в якій потрібно відсортувати файли або exit для виходу: ')
+        if folder_name == "exit":
+            break
+        path = Path(folder_name)
+        if path.exists():
+            if path.is_dir():
+                items = path.glob("**/*")
+                for item in items:
+                    if any(part in str(item) for part in ignored_folders):
                         continue
-                    elif item.is_dir():
-                        if not any(item.iterdir()):
-                            item.rmdir()
+                    try:
+                        if item.suffix in [".mp4", ".avi", ".mov", ".mkv"]:
+                            dir = path / "video"
+                            count_list.append(item.suffix)
+                        elif item.suffix in [".mp3", ".ogg", ".wav", ".amr"]:
+                            dir = path / "audio"
+                            count_list.append(item.suffix)
+                        elif item.suffix in [
+                            ".jpg",
+                            ".jpeg",
+                            ".png",
+                            ".svg",
+                            ".snagx",
+                            ".gif",
+                        ]:
+                            dir = path / "images"
+                            count_list.append(item.suffix)
+                        elif item.suffix in [
+                            ".txt",
+                            ".doc",
+                            ".docx",
+                            ".pdf",
+                            ".xlsx",
+                            ".pptx",
+                        ]:
+                            dir = path / "documents"
+                            count_list.append(item.suffix)
+                        elif item.suffix in [".zip", ".gz", ".tar"]:
+                            dir = path / "archives" / item.stem
+                            count_list.append(item.suffix)
+                            dir.mkdir(parents=True, exist_ok=True)
+                            shutil.unpack_archive(item, dir)
+                            continue
+                        elif item.is_dir():
+                            if not any(item.iterdir()):
+                                item.rmdir()
+                            else:
+                                try:
+                                    item.rename(
+                                        item.resolve().parent / Path(normalize(item.name))
+                                    )
+                                except FileExistsError:
+                                    item.rename(
+                                        item.resolve().parent
+                                        / Path(normalize(item.name) + "1")
+                                    )
+                            continue
+
                         else:
-                            try:
-                                item.rename(
-                                    item.resolve().parent / Path(normalize(item.name))
-                                )
-                            except FileExistsError:
-                                item.rename(
-                                    item.resolve().parent
-                                    / Path(normalize(item.name) + "1")
-                                )
-                        continue
+                            continue
 
-                    else:
-                        continue
+                        dir.mkdir(parents=True, exist_ok=True)
+                        item.rename(dir / (normalize(item.stem) + item.suffix))
 
-                    dir.mkdir(parents=True, exist_ok=True)
-                    item.rename(dir / (normalize(item.stem) + item.suffix))
+                    except PermissionError:
+                        print(f"The file {item.name} is occupied by a program or process")
 
-                except PermissionError:
-                    print(f"The file {item.name} is occupied by a program or process")
-
+            else:
+                print(f"{path} is e file")
+            count_files(count_list)
+            break
         else:
-            print(f"{path} is e file")
-    else:
-        print(f"{path.absolute()} is not exist")
+            print(f"{path.absolute()} is not exist")
 
-    count_files(count_list)
+
+
 
 
 def count_files(count_list):
@@ -198,13 +205,9 @@ def count_files(count_list):
         print(f'В папку "documents" переміщено: \n{count_documents}')
 
 
-def main():
-    folder_name = r"C:\Users\andrey.vlasiuk\Desktop"
-    sort_file(folder_name=folder_name)
-
 if __name__ == "__main__":
     if len(sys.argv) > 1:
         folder_name = sys.argv[1]
         sort_file(folder_name)
     else:
-        main()
+        sort_file()
