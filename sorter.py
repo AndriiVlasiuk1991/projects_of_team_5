@@ -84,20 +84,22 @@ def normalize(name):
 
 def sort_file(folder_name):
     path = Path(folder_name)
+    count_list = []
     ignored_folders = ["video", "audio", "images", "documents", "archives"]
 
     if path.exists():
         if path.is_dir():
             items = path.glob("**/*")
-
             for item in items:
-                if item.is_dir() and item.name in ignored_folders:
+                if any(part in str(item) for part in ignored_folders):
                     continue
                 try:
                     if item.suffix in [".mp4", ".avi", ".mov", ".mkv"]:
                         dir = path / "video"
+                        count_list.append(item.suffix)
                     elif item.suffix in [".mp3", ".ogg", ".wav", ".amr"]:
                         dir = path / "audio"
+                        count_list.append(item.suffix)
                     elif item.suffix in [
                         ".jpg",
                         ".jpeg",
@@ -107,6 +109,7 @@ def sort_file(folder_name):
                         ".gif",
                     ]:
                         dir = path / "images"
+                        count_list.append(item.suffix)
                     elif item.suffix in [
                         ".txt",
                         ".doc",
@@ -116,12 +119,14 @@ def sort_file(folder_name):
                         ".pptx",
                     ]:
                         dir = path / "documents"
+                        count_list.append(item.suffix)
                     elif item.suffix in [".zip", ".gz", ".tar"]:
                         dir = path / "archives" / item.stem
+                        count_list.append(item.suffix)
                         dir.mkdir(parents=True, exist_ok=True)
                         shutil.unpack_archive(item, dir)
                         continue
-                    elif item.is_dir() and item.name not in ignored_folders:
+                    elif item.is_dir():
                         if not any(item.iterdir()):
                             item.rmdir()
                         else:
@@ -150,10 +155,56 @@ def sort_file(folder_name):
     else:
         print(f"{path.absolute()} is not exist")
 
+    count_files(count_list)
+
+
+def count_files(count_list):
+    index_count = {}
+    count_video = ""
+    count_audio = ""
+    count_images = ""
+    count_documents = ""
+    count_archives = ""
+
+    for index in count_list:
+        if index in index_count:
+            index_count[index] += 1
+        else:
+            index_count[index] = 1
+
+    print(f"Сортування файлів успішно завершено: ")
+
+    for index, count in index_count.items():
+        if index in [".mp4", ".avi", ".mov", ".mkv"]:
+            count_video += f'\t - {count} файлів {index}\n'
+        elif index in [".mp3", ".ogg", ".wav", ".amr"]:
+            count_audio += f'\t - {count} файлів {index}\n'
+        elif index in [".jpg", ".jpeg", ".png", ".svg", ".snagx", ".gif"]:
+            count_images += f'\t - {count} файлів {index}\n'
+        elif index in [".txt", ".doc", ".docx", ".pdf", ".xlsx", ".pptx"]:
+            count_documents += f'\t - {count} файлів {index}\n'
+        elif index in [".zip", ".gz", ".tar"]:
+            count_archives += f'\t - {count} архівів {index}\n'
+
+    if len(count_archives):
+        print(f'В папку "archives" розархівовано: \n{count_archives}')
+    if len(count_images):
+        print(f'В папку "images" переміщено: \n{count_images}')
+    if len(count_audio):
+        print(f'В папку "audio" переміщено: \n{count_audio}')
+    if len(count_video):
+        print(f'В папку "video" переміщено: \n{count_video}')
+    if len(count_documents):
+        print(f'В папку "documents" переміщено: \n{count_documents}')
+
+
+
+
 
 def main():
     folder_name = r"C:\Users\andrey.vlasiuk\Desktop"
     sort_file(folder_name=folder_name)
+    # count_files(folder_name=folder_name, counting_folders=["video", "audio", "images", "documents", "archives"])
 
 
 if __name__ == "__main__":
@@ -161,4 +212,4 @@ if __name__ == "__main__":
         folder_name = sys.argv[1]
         sort_file(folder_name)
     else:
-        main() #++
+        main()
