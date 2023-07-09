@@ -12,29 +12,8 @@ def main():
     elif command == '2':
         pass
     elif command == '3':
-        list_error_files = []
-        while True:
-            try:
-                folder_name = r"C:\Users\andrey.vlasiuk\Desktop"
-                sort_file(folder_name=folder_name)
-            except OSError as error:
-                error_file = os.path.basename(error.filename)
-                if error_file not in list_error_files:
-                    list_error_files.append(error_file)
-                    if error.errno == 22:
-                        print(f"Файл {error_file} не відсортовано. Неприпустима назва файлу")
-                        continue
-                    elif error.errno in [17, 183]:
-                        print(f"Файл {error_file} не відсортовано. Цей файл вже існує в папці призначення")
-                        continue
-                else:
-                    print(error)
-                    continue
-            else:
-                break
-
-
-
+        folder_name = r"C:\Users\andrey.vlasiuk\Desktop"
+        sort_file(folder_name=folder_name)
     else:
         pass
 
