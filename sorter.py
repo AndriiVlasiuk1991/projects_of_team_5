@@ -152,14 +152,14 @@ def sort_file():
                         item.rename(dir / (normalize(item.stem) + item.suffix))
 
                     except PermissionError:
-                        print(f"The file {item.name} is occupied by a program or process")
+                        print(f"Файл {item.name} зайнятий програмою або процесом")
 
             else:
-                print(f"{path} is e file")
+                print(f"{path} це файл")
             count_files(count_list)
             break
         else:
-            print(f"{path.absolute()} is not exist")
+            print(f"{path.absolute()} не існує")
 
 
 
