@@ -1,6 +1,6 @@
 import sys
 from sorter import sort_file
-from note_book import magic_8_ball, note_add, note_find, note_show_all, note_remove, note_edite
+from note_book import main_note_book
 from address_book import main_addressbook
 
 
@@ -18,7 +18,7 @@ def main():
             print("Ви завершили роботу в книзі клієнтів!")
         elif command == '2':
             print("\nВи обрали команду під номером 2. Отже, вітаємо в нотатках!")
-
+            main_note_book()
             print("Ви завершили роботу в нотатках!")
         elif command == '3':
             print("\nВи обрали команду під номером 3 - 'Сортування папки'!")
