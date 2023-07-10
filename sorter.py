@@ -2,7 +2,6 @@ from pathlib import Path
 import sys
 import shutil
 
-
 def normalize(name):
     map = {
         ord("а"): "a",
@@ -156,7 +155,9 @@ def sort_file():
 
             else:
                 print(f"{path} це файл")
+
             count_files(count_list)
+            input("Натисніть клавішу Enter для повернення в головне меню...")
             break
         else:
             print(f"{path.absolute()} не існує")
