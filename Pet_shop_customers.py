@@ -1,14 +1,14 @@
 import sys
+import os
 from sorter import sort_file
 from note_book import main_note_book
 from customer_book import main_customer_book
 
-
 def main():
     print('Вітаю!')
+    print('\n--------------- Menu ---------------')
     while True:
-        print("\n--------------- Menu ---------------\n")
-        print('Ви у головному меню!\nДоступні команди:')
+        print('\nВи у головному меню!\nДоступні команди:')
         print('1 - Книга клієнтів\n2 - Нотатки\n3 - Сортувати файли\n4 - Вихід')
         command = input('Оберіть команду: ')
 
@@ -30,6 +30,8 @@ def main():
         else:
             print("Такої команди не існує! Оберіть команду з вище перелічених!")
             print("------------ Команди не існує ------------\n")
+
+        os.system('cls' if os.name == 'nt' else 'clear')
 
 
 if __name__ == '__main__':
