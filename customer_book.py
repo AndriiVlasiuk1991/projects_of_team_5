@@ -185,18 +185,29 @@ customer_book = СustomerBook()
 @input_error
 def add_contact(name, phone, birthday=None, address=None, email=None):
     record = Record(name, address, birthday, email)
-    correct_phone = phone.replace("-", "").replace(" ", "")
-    if len(correct_phone) == 13 and correct_phone.startswith("+380") and (all(not char. isalpha() for char in correct_phone[1:])):
+    correct_phone = phone.replace(
+        "-", "").replace(" ", "").replace("(", "").replace(")", "")
+    if len(correct_phone) == 10 and correct_phone.startswith("0") and (all(not char. isalpha() for char in correct_phone)):
+        new_correct_phone = f"+38{correct_phone}"
+        record.add_phone(new_correct_phone)
+    elif len(correct_phone) == 11 and correct_phone.startswith("80") and (all(not char. isalpha() for char in correct_phone)):
+        new_correct_phone = f"+3{correct_phone}"
+        record.add_phone(new_correct_phone)
+    elif len(correct_phone) == 12 and correct_phone.startswith("380") and (all(not char. isalpha() for char in correct_phone)):
+        new_correct_phone = f"+{correct_phone}"
+        record.add_phone(new_correct_phone)
+    elif len(correct_phone) == 13 and correct_phone.startswith("+380") and (all(not char. isalpha() for char in correct_phone[1:])):
+        new_correct_phone = correct_phone[::]
         record.add_phone(correct_phone)
     else:
-        return "Ви ввели неправильний номер! Номер повинен починатися з «+380» і містити всі цифри!"
+        return "Ви ввели неправильний номер! Номер повинен містити всі цифри та не менше 10 символів!"
     if birthday:
         try:
             record.birthday.value = birthday
         except ValueError as e:
             return str(e)
     customer_book.add_record(record)
-    return f"Додано контакт '{name}' з номером телефону '{correct_phone}', днем народження '{birthday}', адресою '{address}', і  електронною адресою '{email}'!."
+    return f"Додано контакт '{name}' з номером телефону '{new_correct_phone}', днем народження '{birthday}', адресою '{address}', і  електронною адресою '{email}'!."
 
 
 @input_error
@@ -210,7 +221,7 @@ def change_phone(name, old_phone, new_phone):
         record.edit_phone(correct__old_phone, correct_new_phone)
         return f"Номер телефону для контакту '{name}' змінено на '{correct_new_phone}'."
     else:
-        return "Ви ввели неправильний номер! Номер повинен починатися з «+380» і містити всі цифри!"
+        return "Ви ввели неправильний номер! Номер повинен містити всі цифри і мати не менше 10 символів!"
 
 
 @input_error
@@ -292,33 +303,78 @@ def main_customer_book():
         if command == "hello":
             print(f"Чим я можу допомогти?")
         elif command == "add":
-            try:
-                name = str(input("Введіть ім'я > "))
-                phone = input("Введіть номер телефону > ")
-                birthday = input(
-                    "Введіть день народження у форматі YYYY-MM-DD (необов'язково) > ")
-                address = input("Введіть адресу (необов'язково) > ")
-                email = input("Введіть електронну пошту (необов'язково) > ")
-                print(add_contact(name, phone, birthday, address, email))
-            except ValueError:
-                print("Непрвильні дані.")
+            while True:
+                try:
+                    name = str(input("Введіть ім'я > "))
+                    if name == "close" or "exit" or "good bye":
+                        break
+                    phone = input("Введіть номер телефону > ")
+                    if name == "close" or "exit" or "good bye":
+                        break
+                    birthday = input(
+                        "Введіть день народження у форматі YYYY-MM-DD (необов'язково) > ")
+                    if name == "close" or "exit" or "good bye":
+                        break
+                    address = input("Введіть адресу (необов'язково) > ")
+                    if name == "close" or "exit" or "good bye":
+                        break
+                    email = input(
+                        "Введіть електронну пошту (необов'язково) > ")
+                    if name == "close" or "exit" or "good bye":
+                        break
+                    res = add_contact(name, phone, birthday, address, email)
+
+                    if not res.startswith("Додано"):
+                        print(add_contact(name, phone, birthday, address, email))
+                    else:
+                        print(add_contact(name, phone, birthday, address, email))
+                        break
+                except ValueError:
+                    print("Непрвильні дані.")
         elif command == "change":
-            try:
-                name, old_phone = input(
-                    "Введіть ім'я та старий номер телефону > ").lower().split()
-                new_phone = input("Введіть новий номер телефону > ")
-                print(change_phone(name, old_phone, new_phone))
-            except ValueError:
-                print("Неправильні дані.")
+            while True:
+                try:
+                    name, old_phone = input(
+                        "Введіть ім'я та старий номер телефону > ").lower().split()
+                    new_phone = input("Введіть новий номер телефону > ")
+                    if (name or old_phone or new_phone) == "close" or "exit" or "good bye":
+                        break
+                    res = change_phone(name, old_phone, new_phone)
+                    if not res.startswith("Номер"):
+                        print(change_phone(name, old_phone, new_phone))
+                    else:
+                        print(change_phone(name, old_phone, new_phone))
+                        break
+                except ValueError:
+                    print("Неправильні дані.")
         elif command == "remove":
-            name = input("Введіть ім'я > ")
-            print(remove_contact(name))
+            while True:
+                name = input("Введіть ім'я > ")
+                if name == "close" or "exit" or "good bye":
+                    break
+                res = remove_contact(name)
+                if not res.endswith("видалено."):
+                    print(remove_contact(name))
+                else:
+                    print(remove_contact(name))
+                    break
         elif command == "phone":
-            name = input("Введіть ім'я > ")
-            print(get_phone(name))
+            while True:
+                name = input("Введіть ім'я > ")
+                if name == "close" or "exit" or "good bye":
+                    break
+                res = get_phone(name)
+                if not res.startswith("Номер"):
+                    print(get_phone(name))
+                else:
+                    print(get_phone(name))
+                    break
         elif command == "next birthday":
-            name = input("Введіть ім'я > ")
-            print(get_days_to_birthday(name))
+            while True:
+                name = input("Введіть ім'я > ")
+                if name == "close" or "exit" or "good bye":
+                    break
+                print(get_days_to_birthday(name))
         elif command == "birthday list":
             num = input("Введіть кількість днів: ")
             try:
