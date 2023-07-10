@@ -1,7 +1,7 @@
 import sys
 from sorter import sort_file
 from note_book import main_note_book
-from address_book import main_addressbook
+from customer_book import main_customer_book
 
 
 def main():
@@ -14,14 +14,14 @@ def main():
 
         if command == '1':
             print("\nВи обрали команду під номером 1. Отже, вітаємо в книзі клієнтів!")
-            main_addressbook()
+            main_customer_book()
             print("Ви завершили роботу в книзі клієнтів!")
         elif command == '2':
             print("\nВи обрали команду під номером 2. Отже, вітаємо в нотатках!")
             main_note_book()
             print("Ви завершили роботу в нотатках!")
         elif command == '3':
-            print("\nВи обрали команду під номером 3 - 'Сортування папки'!")
+            print("\nВи обрали команду під номером 3 - 'Сортування файлів'!")
             sort_file()
             print("Сортування папки завершено!")
         elif command == '4':

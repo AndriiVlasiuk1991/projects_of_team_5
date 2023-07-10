@@ -25,14 +25,14 @@ def hello_command(params):
     return "How can I help you?"
 
 def iter_record(params):
-    for addres in address_book:
+    for addres in customer_book:
         print(addres)
         print('------------------------------')
     
 def find_command(params):
     if not params:
         return "Enter a word to search"
-    return "\n".join(f" {result}" for result in address_book.search_by_content(params))        
+    return "\n".join(f" {result}" for result in customer_book.search_by_content(params))        
 
 def main_note_book():
     note_book = NoteBook()
@@ -127,7 +127,7 @@ def add_command(params):
     birthday = None
     if len(list_param) == 3:
         birthday = list_param[2]
-    record = address_book.search_record(name)
+    record = customer_book.search_record(name)
     record.add_phone(phone)
     if birthday:
         record.add_birthday(birthday)
@@ -136,22 +136,22 @@ def add_command(params):
 @input_error
 def change_command(params):
     name, phone, new_phone = params.split(' ')
-    record = address_book.search_record(name)
+    record = customer_book.search_record(name)
     record.edit_phone(phone, new_phone)
     return f"Phone number for {name} changed"
 
 @input_error
 def phone_command(params):
     name = params.strip()
-    return address_book.search_records(name)
+    return customer_book.search_records(name)
 
 @input_error
 def birthday_command(params):
     name = params.strip()
-    return address_book.search_records(name)
+    return customer_book.search_records(name)
     
 def show_all_command(params):
-    return address_book.show_all_records()
+    return customer_book.show_all_records()
 
 class NoteBook(UserDict):
     def __init__(self):
@@ -364,7 +364,7 @@ class RecordNote:
             record.add_tag(tag)
         return record
 
-class AddressBook(UserDict):
+class CustomerBook(UserDict):
     def __init__(self):
         super().__init__()
         self.data = {}
@@ -422,7 +422,7 @@ class AddressBook(UserDict):
             json.dump(data, file, default=str)
 
     def load_from_file(self):
-        file_path = os.path.join(os.getcwd(), "address_book.json")
+        file_path = os.path.join(os.getcwd(), "customer_book.json")
         if os.path.isfile(file_path):
             with open(file_path, 'r') as file:
                 data = json.load(file)
@@ -572,7 +572,7 @@ def main():
     while True:
         user_input = input("> ").lower()
         if user_input in ["good bye", "close", "exit"]:
-            address_book.save_to_file(os.path.join(os.getcwd(), "address_book.json"))
+            customer_book.save_to_file(os.path.join(os.getcwd(), "customer_book.json"))
             note_book.save_to_file(os.path.join(os.getcwd(), "note_book.json"))
             print("Good bye!")
             break
@@ -589,8 +589,8 @@ def main():
 
 if __name__ == "__main__":
     #contacts = {}
-    address_book = AddressBook()
-    address_book.load_from_file()
+    customer_book = CustomerBook()
+    customer_book.load_from_file()
 
     note_book = NoteBook()
     note_book.load_from_file()

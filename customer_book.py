@@ -106,7 +106,7 @@ class Record:
         return result
 
 
-class AddressBook:
+class СustomerBook:
     def __init__(self):
         self.data = {}
 
@@ -116,11 +116,11 @@ class AddressBook:
             existing_record.phones.extend(record.phones)
         else:
             self.data[record.name.value] = record
-        self.save_to_file('address_book.pkl')
+        self.save_to_file('customer_book.pkl')
 
     def delete_record(self, name):
         del self.data[name]
-        self.save_to_file('address_book.pkl')
+        self.save_to_file('customer_book.pkl')
 
     def search_by_name(self, name):
         result = []
@@ -179,7 +179,7 @@ def input_error(func):
     return wrapper
 
 
-address_book = AddressBook()
+customer_book = СustomerBook()
 
 
 @input_error
@@ -195,7 +195,7 @@ def add_contact(name, phone, birthday=None, address=None, email=None):
             record.birthday.value = birthday
         except ValueError as e:
             return str(e)
-    address_book.add_record(record)
+    customer_book.add_record(record)
     return f"Додано контакт '{name}' з номером телефону '{correct_phone}', днем народження '{birthday}', адресою '{address}', і  електронною адресою '{email}'!."
 
 
@@ -203,10 +203,10 @@ def add_contact(name, phone, birthday=None, address=None, email=None):
 def change_phone(name, old_phone, new_phone):
     correct__old_phone = old_phone.replace("-", "").replace(" ", "")
     correct_new_phone = new_phone.replace("-", "").replace(" ", "")
-    if name not in address_book.data:
+    if name not in customer_book.data:
         return f"!!! Контакт'{name}' не існує !!!"
     if len(correct_new_phone) == 13 and correct_new_phone.startswith("+380") and (all(not char. isalpha() for char in correct_new_phone[1:])):
-        record = address_book.data[name]
+        record = customer_book.data[name]
         record.edit_phone(correct__old_phone, correct_new_phone)
         return f"Номер телефону для контакту '{name}' змінено на '{correct_new_phone}'."
     else:
@@ -215,26 +215,26 @@ def change_phone(name, old_phone, new_phone):
 
 @input_error
 def remove_contact(name):
-    if name not in address_book.data:
+    if name not in customer_book.data:
         return f"!!! Контакт '{name}' не існує !!!"
-    address_book.delete_record(name)
+    customer_book.delete_record(name)
     return f"Контакт '{name}' видалено."
 
 
 @input_error
 def get_phone(name):
-    if name not in address_book.data:
+    if name not in customer_book.data:
         return f"Контакт '{name}' не існує."
-    record = address_book.data[name]
+    record = customer_book.data[name]
     phones = ", ".join([str(phone) for phone in record.phones])
     return f"Номер(и) телефону для контакту '{name}': {phones}"
 
 
 @input_error
 def get_days_to_birthday(name):
-    if name not in address_book.data:
+    if name not in customer_book.data:
         return f"Контакт '{name}' не існує."
-    record = address_book.data[name]
+    record = customer_book.data[name]
     days_left = record.days_to_birthday()
     if days_left:
         return f"Кількість днів до наступного дня народження {name}: {days_left}"
@@ -245,38 +245,38 @@ def get_days_to_birthday(name):
 def next_birthday(days):
     result = []
     if days >= 1:
-        for k, v in address_book.data.items():
+        for k, v in customer_book.data.items():
             _ = datetime.strptime(
-                address_book.data[k].birthday.value, "%Y-%m-%d")
+                customer_book.data[k].birthday.value, "%Y-%m-%d")
             dt = datetime(year=datetime.now().year, month=_.month, day=_.day)
             td = datetime.now() + timedelta(days=days)
             if _.month < datetime.now().month:
                 dt += timedelta(weeks=52)
                 if (dt - datetime.now()).days <= days:
                     result.append(
-                        f"{k}:{address_book.data[k].birthday.value}, {k}'s день народження через {(dt - datetime.now()).days} днів!")
+                        f"{k}:{customer_book.data[k].birthday.value}, {k}'s день народження через {(dt - datetime.now()).days} днів!")
             elif _.month == datetime.now().month and _.day < datetime.now().day:
                 dt += timedelta(weeks=52)
                 if (dt - datetime.now()).days <= days:
                     result.append(
-                        f"{k}:{address_book.data[k].birthday.value}, {k}'s день народження через {(dt - datetime.now()).days} днів!")
+                        f"{k}:{customer_book.data[k].birthday.value}, {k}'s день народження через {(dt - datetime.now()).days} днів!")
             elif _.month == datetime.now().month and _.day == datetime.now().day:
                 result.append(
-                    f"{k}:{address_book.data[k].birthday.value}, {k}'s день народження сьогодні!")
+                    f"{k}:{customer_book.data[k].birthday.value}, {k}'s день народження сьогодні!")
             else:
                 if (dt - datetime.now()).days <= days:
                     result.append(
-                        f"{k}:{address_book.data[k].birthday.value}, {k}'s день народження через {(dt - datetime.now()).days} днів!")
+                        f"{k}:{customer_book.data[k].birthday.value}, {k}'s день народження через {(dt - datetime.now()).days} днів!")
         return result
     else:
         return "Кількість днів має бути більша за 0!"
 
 
 def show_all_contacts():
-    if not address_book.data:
+    if not customer_book.data:
         return "Список контактів порожній!"
     result = "Контакти:\n"
-    for record in address_book.data.values():
+    for record in customer_book.data.values():
         result += str(record) + "\n"
     return result
 
@@ -284,8 +284,8 @@ def show_all_contacts():
 command_text = 'Hello, Add, Change, Remove, Phone, Next birthday, Birthday list, Search, Show all, Good bye, Close or Exit or Good bye'
 
 
-def main_addressbook():
-    address_book.load_from_file('address_book.pkl')
+def main_customer_book():
+    customer_book.load_from_file('customer_book.pkl')
     print(f"Доступні команди: {command_text}")
     while True:
         command = input("Введіть команду  > ").lower()
@@ -331,10 +331,10 @@ def main_addressbook():
                 "Введіть ім'я,номер телефону або адресу > ")
             contacts = []
             if inp.isdigit():
-                contacts = address_book.search_by_phone(inp)
+                contacts = customer_book.search_by_phone(inp)
             else:
-                contacts = address_book.search_by_name(
-                    inp) + address_book.search_by_address(inp)
+                contacts = customer_book.search_by_name(
+                    inp) + customer_book.search_by_address(inp)
             if contacts:
                 result = "Результат:\n"
                 for record in contacts:
@@ -349,8 +349,8 @@ def main_addressbook():
             break
         else:
             print(f"Невідома команда. Доступні команди: {command_text}")
-    address_book.save_to_file('address_book.pkl')
+    customer_book.save_to_file('customer_book.pkl')
 
 
 if __name__ == "__main__":
-    main_addressbook()
+    main_customer_book()
