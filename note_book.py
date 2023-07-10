@@ -81,9 +81,42 @@ def find_command(params):
         return "Enter a word to search"
     return "\n".join(f" {result}" for result in address_book.search_by_content(params))        
 
-def note_find(params=''):
-
+def main_note_book():
     note_book.load_from_file()
+    while True:
+        print('\nДоступні команди:')
+        print('1 - Для створення нової нотатки\n2 - Для пошуку по нотаткам\n3 - Вивести всі нотатки\n4 - Видалити нотатку по назві\n5 - Редагувати нотатку\n6 - Відсортувати за тегами\n7 - Для виходу в головне меню')
+        commandNote = input('Оберіть команду: ')
+        if commandNote == '1':
+            note_add()
+        elif commandNote == '2':
+            result = note_find()
+            if result == '':
+                print('Нічого не знайдено.')
+            else:
+                print(result)  
+        elif commandNote == '3':
+            print(note_book.show_all_records())
+        elif commandNote == '4':
+            note_remove()
+        elif commandNote == '5':
+            note_edite()
+        elif commandNote == '6':
+            sorted_records = note_book.sort_records_by_tags()
+            print('')
+            for name, record in sorted_records:
+                print(f"{name}':"+"".join(f" {tag.value}" for tag in record.tags)+' Текст нотатки: '+ str(record.text_note.value))
+            #sorted_notes = note_book.sort_notes_by_tag()
+            #for note in sorted_notes:
+            #    print(f"Нотатка з тегами : {note.title} - {note.tags}")
+        elif commandNote == '7':
+            break
+        else:
+            print('Команда невідома')
+    note_book.save_to_file(os.path.join(os.getcwd(), "note_book.json"))
+    return
+    
+def note_find(params=''):
 
     wordfind = ""
     if not params:
@@ -109,8 +142,6 @@ def note_add(params=''):
     #tags = list_param[1:len(list_param)-1]
     #text_note = list_param[len(list_param)-1]
 
-    note_book.load_from_file()
-
     name = input("Введіть назву нотатки: ")
     tags_text = input("Введіть теги через пробіл: ")
     tags = tags_text.split(' ')
@@ -122,8 +153,6 @@ def note_add(params=''):
     if text_note:
         record.add_note(text_note)
 
-    note_book.save_to_file(os.path.join(os.getcwd(), "note_book.json"))
-    
     return f"Нотатка '{name}' успішно додана!"
 
 def note_remove():
@@ -133,23 +162,19 @@ def note_remove():
     else:    
         #record = note_book.search_by_name(name)
         #note_delet = str(record)
-        note_book.load_from_file()
-        note_book.remove_record(name)
-        note_book.save_to_file(os.path.join(os.getcwd(), "note_book.json"))
-        print(f"Нотатка '{name}' видалена!")
+        #note_book.load_from_file()
+        note_book.remove_record_new(name)
 
 def note_edite():    
     name = input("Введіть назву нотатки яку потрібно відредагувати: ")
     if name == '':
         print('Нічого не введено, редагування відхилено.')
     else:
-        note_book.load_from_file()
+        #note_book.load_from_file()
         note_book.edite_record(name)
-        note_book.save_to_file(os.path.join(os.getcwd(), "note_book.json"))
-        print(f"Нотатка '{name}' відредагована!")    
-    
+        #note_book.save_to_file(os.path.join(os.getcwd(), "note_book.json"))
+           
 def note_show_all(params=''):
-    note_book.load_from_file()
     return note_book.show_all_records()
 
 @input_error
@@ -191,11 +216,26 @@ class NoteBook(UserDict):
         super().__init__()
         self.data = {}
 
+    def sort_records_by_tags(self):
+        sorted_records = sorted(self.data.items(), key=lambda item: item[1].tags)
+        return sorted_records
+    
     def add_record(self, record):
         self.data[record.name.value] = record
 
     def remove_record(self, name):
         del self.data[name]
+
+    def remove_record_new(self, text_name):
+        record = ''
+        for find_record in self.data.values():
+            if text_name.lower() in find_record.name.value.lower():
+                del self.data[find_record.name.value]
+                print(f"Нотатка '{text_name}' видалена!")
+                return
+        if not record:
+            print(f"Немає нотатки з назвою '{text_name}'.")
+            return    
 
     def edite_record(self, text_name):
         record = ''
@@ -207,28 +247,45 @@ class NoteBook(UserDict):
             print(f"Немає нотатки з назвою '{text_name}'.")
             return
 
-        print('1 - Змінити назву\n2 - Видалити чи змінити тег\n3 - Замінити текст нотатки\n4 - Додати текст до нотатки')
+        print('1 - Змінити назву\n2 - Видалити, додати або змінити тег\n3 - Замінити текст нотатки\n4 - Додати текст до нотатки')
         commandNote = input('Оберіть команду: ')
         if commandNote == '1':
             NewName = input('Введіть нову назву нотатки: ')
+            delName = record.name.value
             record.add_name(NewName)
+            del self.data[delName]
+            self.data[record.name.value] = record
         elif commandNote == '2':
-            text_mesage = 'Теги:'
-            for tag in record.tags:
-                text_mesage += ' ' + tag.value
-            print(text_mesage)
-            FindTag = input('Введіть назву тега який потрібно видалити чи змінити: ')
-            NewTag = input('Введіть нову назву тега щоб змінити або нічого щоб видалити: ')
-            if NewTag == '':
-                record.remove_tag(FindTag)
-            else:
-                record.edit_tag(FindTag, NewTag)
+            while True:
+                text_mesage = 'Теги:'
+                for tag in record.tags:
+                    text_mesage += ' ' + tag.value
+                print(text_mesage)
+                FindTag = input('Введіть назву тега який потрібно видалити, додати чи змінити (або 0 щоб вийти з редагування): ')
+                if FindTag == '0':
+                    return
+                find_tag = False
+                for tag in record.tags:
+                    if FindTag.lower() in tag.value.lower(): 
+                        find_tag = True
+                if not find_tag:
+                    AddTag = input('Такого тега немає введіть 1 щоб додати: ')
+                    if AddTag == '1':
+                        record.add_tag(FindTag)
+                    continue
+                NewTag = input('Введіть нову назву тега щоб змінити або нічого щоб видалити: ')
+                if NewTag == '':
+                    record.remove_tag(FindTag)
+                else:
+                    record.edit_tag(FindTag, NewTag)
+
         elif commandNote == '3':
             add_text_note = input('Введіть новий текст нотатки: ')
             record.add_note(add_text_note)
         elif commandNote == '4':
             add_text_note = input('Введіть текст який потрібно додати до тексту нотатки: ')
             record.add_text_note(add_text_note)
+        print(f"Нотатка '{text_name}' відредагована!") 
 
     def search_record(self, search_criteria):
         for record in self.data.values():
@@ -288,13 +345,20 @@ class NoteBook(UserDict):
     def search_by_content(self, search_string):
         results = []
         for record in self.data.values():
+            find = False
             if search_string.lower() in record.name.value.lower():
                 results.append(str(record))
-            else:
+                find = True
+            if not find:
                 for tag in record.tags:
                     if search_string.lower() in tag.value.lower():
                         results.append(str(record))
+                        find = True
                         break
+            if not find:
+                if search_string.lower() in record.text_note.value.lower():
+                    results.append(str(record))
+                    
         return results
 
     def search_by_tag(self, search_string):
@@ -311,7 +375,6 @@ class NoteBook(UserDict):
         for record in self.data.values():
             if search_string.lower() in record.name.value.lower():
                 return record
-
 
 class RecordNote:
     def __init__(self, name, text_note=None):
@@ -504,7 +567,14 @@ class Field:
         self._value = new_value
 
 class Name(Field):
-    pass
+    def __lt__(self, other):
+        return self.value < other.value
+
+    def __gt__(self, other):
+        return self.value > other.value
+
+    def __eq__(self, other):
+        return self.value == other.value
 
 class Phone(Field):
     def __init__(self, value):
