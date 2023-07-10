@@ -35,6 +35,7 @@ def find_command(params):
     return "\n".join(f" {result}" for result in address_book.search_by_content(params))        
 
 def main_note_book():
+    note_book = NoteBook()
     note_book.load_from_file()
     while True:
         print('\nДоступні команди:')
@@ -585,12 +586,13 @@ def main():
         else:
             print("Unknown command")
 
-#contacts = {}
-address_book = AddressBook()
-address_book.load_from_file()
-
-note_book = NoteBook()
-note_book.load_from_file()
 
 if __name__ == "__main__":
+    #contacts = {}
+    address_book = AddressBook()
+    address_book.load_from_file()
+
+    note_book = NoteBook()
+    note_book.load_from_file()
+    
     main()
