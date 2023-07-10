@@ -27,14 +27,15 @@ class Phone(Field):
     @Field.value.setter
     def value(self, new_value):
         if not str(new_value).isdigit():
-            raise ValueError("Invalid phone number. Phone number must be numeric.")
+            raise ValueError(
+                "Недійсний номер телефону. Номер телефону має бути цифровим.")
 
 
 class Email(Field):
     @Field.value.setter
     def value(self, new_value):
         if "@" not in new_value:
-            raise ValueError("Invalid email address.")
+            raise ValueError("Невірна адреса електронної пошти.")
 
 
 class Address(Field):
@@ -48,7 +49,7 @@ class Birthday(Field):
             datetime.strptime(new_value, "%Y-%m-%d")
         except ValueError:
             raise ValueError(
-                "Invalid birthday format. Birthday must be in the format YYYY-MM-DD.")
+                "Неправильний формат дня народження. Дата народження має бути у форматі YYYY-MM-DD.")
         self._value = new_value
 
 
@@ -71,16 +72,35 @@ class Record:
             if old_phone in str(phone.value):
                 self.phones[i] = Phone(new_phone)
 
+    def days_to_birthday(self):
+        if self.birthday:
+            dt_birthday = datetime.strptime(self.birthday.value, "%Y-%m-%d")
+            dt_birthday_in_this_year = datetime(
+                year=datetime.now().year, month=dt_birthday.month, day=dt_birthday.day)
+            if dt_birthday_in_this_year.month < datetime.now().month:
+                dt_birthday_in_this_year += timedelta(weeks=52)
+                days_before_birthday = dt_birthday_in_this_year - datetime.now()
+                return f"{days_before_birthday.days} днів до дня народження!"
+            elif dt_birthday_in_this_year.month == datetime.now().month and dt_birthday_in_this_year.day == datetime.now().day:
+                return f"День народження сьогодні! З Днем Народження!!!!"
+            elif dt_birthday_in_this_year.month == datetime.now().month and dt_birthday_in_this_year.day < datetime.now().day:
+                dt_birthday_in_this_year += timedelta(weeks=52)
+                days_before_birthday = dt_birthday_in_this_year - datetime.now()
+                return f"{days_before_birthday.days} днів до дня народження!"
+            else:
+                days_before_birthday = dt_birthday_in_this_year - datetime.now()
+                return f"{days_before_birthday.days} днів до дня народження!"
+
     def __str__(self):
-        result = f"Name: {self.name}\n"
+        result = f"Ім'я: {self.name}\n"
         if self.address.value:
-            result += f"Address: {self.address}\n"
+            result += f"Адреса: {self.address}\n"
         if self.birthday.value:
-            result += f"Birthday: {self.birthday}\n"
+            result += f"День народження: {self.birthday}\n"
         if self.email.value:
-            result += f"Email: {self.email}\n"
+            result += f"Електронна адреса: {self.email}\n"
         if self.phones:
-            result += "Phones:\n"
+            result += "Номери телефону:\n"
             for phone in self.phones:
                 result += f"- {phone}\n"
         return result
@@ -134,7 +154,7 @@ class AddressBook:
             with open(filename, 'rb') as file:
                 self.data = pickle.load(file)
         else:
-            print(f"File '{filename}' does not exist.")
+            print(f"Файл '{filename}' не існує.")
 
     def __iter__(self):
         self.index = 0
@@ -169,14 +189,14 @@ def add_contact(name, phone, birthday=None, address=None, email=None):
     if len(correct_phone) == 13 and correct_phone.startswith("+380") and (all(not char. isalpha() for char in correct_phone[1:])):
         record.add_phone(correct_phone)
     else:
-        return "You entered the wrong number! The number must start with '+380' and contain all digits!"
+        return "Ви ввели неправильний номер! Номер повинен починатися з «+380» і містити всі цифри!"
     if birthday:
         try:
             record.birthday.value = birthday
         except ValueError as e:
             return str(e)
     address_book.add_record(record)
-    return f"Contact '{name}' with phone '{correct_phone}', birthday '{birthday}', address '{address}', and email '{email}' has been added."
+    return f"Додано контакт '{name}' з номером телефону '{correct_phone}', днем народження '{birthday}', адресою '{address}', і  електронною адресою '{email}'!."
 
 
 @input_error
@@ -184,42 +204,42 @@ def change_phone(name, old_phone, new_phone):
     correct__old_phone = old_phone.replace("-", "").replace(" ", "")
     correct_new_phone = new_phone.replace("-", "").replace(" ", "")
     if name not in address_book.data:
-        return f"!!! Contact '{name}' does not exist !!!"
+        return f"!!! Контакт'{name}' не існує !!!"
     if len(correct_new_phone) == 13 and correct_new_phone.startswith("+380") and (all(not char. isalpha() for char in correct_new_phone[1:])):
         record = address_book.data[name]
         record.edit_phone(correct__old_phone, correct_new_phone)
-        return f"The phone number for contact '{name}' has been changed to '{correct_new_phone}'."
+        return f"Номер телефону для контакту '{name}' змінено на '{correct_new_phone}'."
     else:
-        return "You entered the wrong number! The number must start with '+380' and contain all digits!"
+        return "Ви ввели неправильний номер! Номер повинен починатися з «+380» і містити всі цифри!"
 
 
 @input_error
 def remove_contact(name):
     if name not in address_book.data:
-        return f"!!! Contact '{name}' does not exist !!!"
+        return f"!!! Контакт '{name}' не існує !!!"
     address_book.delete_record(name)
-    return f"Contact '{name}' has been removed."
+    return f"Контакт '{name}' видалено."
 
 
 @input_error
 def get_phone(name):
     if name not in address_book.data:
-        return f"Contact '{name}' does not exist."
+        return f"Контакт '{name}' не існує."
     record = address_book.data[name]
     phones = ", ".join([str(phone) for phone in record.phones])
-    return f"The phone number(s) for contact '{name}' is/are: {phones}"
+    return f"Номер(и) телефону для контакту '{name}': {phones}"
 
 
 @input_error
 def get_days_to_birthday(name):
     if name not in address_book.data:
-        return f"Contact '{name}' does not exist."
+        return f"Контакт '{name}' не існує."
     record = address_book.data[name]
     days_left = record.days_to_birthday()
     if days_left:
-        return f"The number of days until {name}'s next birthday: {days_left}"
+        return f"Кількість днів до наступного дня народження {name}: {days_left}"
     else:
-        return f"{name}'s birthday is today! Happy birthday!"
+        return f"У {name} сьогодні день народження! З Днем Народження!"
 
 
 def next_birthday(days):
@@ -234,98 +254,103 @@ def next_birthday(days):
                 dt += timedelta(weeks=52)
                 if (dt - datetime.now()).days <= days:
                     result.append(
-                        f"{k}:{address_book.data[k].birthday.value}, {k}'s birthday through {(dt - datetime.now()).days} days!")
+                        f"{k}:{address_book.data[k].birthday.value}, {k}'s день народження через {(dt - datetime.now()).days} днів!")
             elif _.month == datetime.now().month and _.day < datetime.now().day:
                 dt += timedelta(weeks=52)
                 if (dt - datetime.now()).days <= days:
                     result.append(
-                        f"{k}:{address_book.data[k].birthday.value}, {k}'s birthday through {(dt - datetime.now()).days} days!")
+                        f"{k}:{address_book.data[k].birthday.value}, {k}'s день народження через {(dt - datetime.now()).days} днів!")
             elif _.month == datetime.now().month and _.day == datetime.now().day:
                 result.append(
-                    f"{k}:{address_book.data[k].birthday.value}, {k}'s birthday today!")
+                    f"{k}:{address_book.data[k].birthday.value}, {k}'s день народження сьогодні!")
             else:
                 if (dt - datetime.now()).days <= days:
                     result.append(
-                        f"{k}:{address_book.data[k].birthday.value}, {k}'s birthday through {(dt - datetime.now()).days} days!")
+                        f"{k}:{address_book.data[k].birthday.value}, {k}'s день народження через {(dt - datetime.now()).days} днів!")
         return result
     else:
-        return "The number of days must be greater than 0"
+        return "Кількість днів має бути більша за 0!"
+
 
 def show_all_contacts():
     if not address_book.data:
-        return "The contact list is empty."
-    result = "Contacts:\n"
+        return "Список контактів порожній!"
+    result = "Контакти:\n"
     for record in address_book.data.values():
         result += str(record) + "\n"
     return result
 
 
-command_text = 'Hello, Add, Change, Remove, Phone, Next birthday, Birthday list, Search, Show all, Good bye, Close or Exit'
+command_text = 'Hello, Add, Change, Remove, Phone, Next birthday, Birthday list, Search, Show all, Good bye, Close or Exit or Good bye'
 
 
-def main():
+def main_addressbook():
     address_book.load_from_file('address_book.pkl')
-    print(f"Enter command: {command_text}")
+    print(f"Доступні команди: {command_text}")
     while True:
-        command = input("Enter command > ").lower()
+        command = input("Введіть команду  > ").lower()
         if command == "hello":
-            print(f"How can I help you?")
+            print(f"Чим я можу допомогти?")
         elif command == "add":
             try:
-                name = str(input("Enter Name > "))
-                phone = input("Enter Phone > ")
-                birthday = input("Enter Birthday in the format YYYY-MM-DD (optional) > ")
-                address = input("Enter Address (optional) > ")
-                email = input("Enter Email (optional) > ")
+                name = str(input("Введіть ім'я > "))
+                phone = input("Введіть номер телефону > ")
+                birthday = input(
+                    "Введіть день народження у форматі YYYY-MM-DD (необов'язково) > ")
+                address = input("Введіть адресу (необов'язково) > ")
+                email = input("Введіть електронну пошту (необов'язково) > ")
                 print(add_contact(name, phone, birthday, address, email))
             except ValueError:
-                print("Invalid input. Name -> String. Phone -> Number")
+                print("Непрвильні дані.")
         elif command == "change":
             try:
-                name, old_phone = input("Enter Name and Old Phone > ").lower().split()
-                new_phone = input("Enter New Phone > ")
+                name, old_phone = input(
+                    "Введіть ім'я та старий номер телефону > ").lower().split()
+                new_phone = input("Введіть новий номер телефону > ")
                 print(change_phone(name, old_phone, new_phone))
             except ValueError:
-                print("Invalid input.")
+                print("Неправильні дані.")
         elif command == "remove":
-            name = input("Enter Name > ")
+            name = input("Введіть ім'я > ")
             print(remove_contact(name))
         elif command == "phone":
-            name = input("Enter Name > ")
+            name = input("Введіть ім'я > ")
             print(get_phone(name))
         elif command == "next birthday":
-            name = input("Enter Name > ")
+            name = input("Введіть ім'я > ")
             print(get_days_to_birthday(name))
         elif command == "birthday list":
-            num = input("Enter the number of days: ")
+            num = input("Введіть кількість днів: ")
             try:
                 days = int(num)
                 print(next_birthday(days))
             except ValueError:
-                print("The number of days must be an integer!")
+                print("Кількість днів має бути цілим числом!")
         elif command == "search":
-            inp = input("Enter Name, Phone, or Address > ")
+            inp = input(
+                "Введіть ім'я,номер телефону або адресу > ")
             contacts = []
             if inp.isdigit():
                 contacts = address_book.search_by_phone(inp)
             else:
-                contacts = address_book.search_by_name(inp) + address_book.search_by_address(inp)
+                contacts = address_book.search_by_name(
+                    inp) + address_book.search_by_address(inp)
             if contacts:
-                result = "Results:\n"
+                result = "Результат:\n"
                 for record in contacts:
                     result += str(record) + "\n"
                 print(result)
             else:
-                print("No contacts found.")
+                print("Контакти не знайдено")
         elif command == "show all":
             print(show_all_contacts())
         elif command == "good bye" or command == "close" or command == "exit":
-            print("Good bye!")
+            print("До зустрічі!")
             break
         else:
-            print(f"Unknown command. Available commands: {command_text}")
+            print(f"Невідома команда. Доступні команди: {command_text}")
     address_book.save_to_file('address_book.pkl')
 
 
 if __name__ == "__main__":
-    main()
+    main_addressbook()
