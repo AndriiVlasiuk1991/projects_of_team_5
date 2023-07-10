@@ -1,6 +1,6 @@
 import sys
 from sorter import sort_file
-from note_book import magic_8_ball, note_add, note_find, note_show_all, note_remove, note_edite, main_note_book
+from note_book import main_note_book
 from address_book import main_addressbook
 
 
