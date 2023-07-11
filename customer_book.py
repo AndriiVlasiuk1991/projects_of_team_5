@@ -106,7 +106,7 @@ class Record:
         return result
 
 
-class СustomerBook:
+class CustomerBook:
     def __init__(self):
         self.data = {}
 
@@ -179,7 +179,7 @@ def input_error(func):
     return wrapper
 
 
-customer_book = СustomerBook()
+customer_book = CustomerBook()
 
 
 @input_error
@@ -306,21 +306,21 @@ def main_customer_book():
             while True:
                 try:
                     name = str(input("Введіть ім'я > "))
-                    if name == "close" or "exit" or "good bye":
+                    if name == ("close" or "exit" or "good bye"):
                         break
                     phone = input("Введіть номер телефону > ")
-                    if name == "close" or "exit" or "good bye":
+                    if phone == ("close" or "exit" or "good bye"):
                         break
                     birthday = input(
                         "Введіть день народження у форматі YYYY-MM-DD (необов'язково) > ")
-                    if name == "close" or "exit" or "good bye":
+                    if birthday == ("close" or "exit" or "good bye"):
                         break
                     address = input("Введіть адресу (необов'язково) > ")
-                    if name == "close" or "exit" or "good bye":
+                    if address == ("close" or "exit" or "good bye"):
                         break
                     email = input(
                         "Введіть електронну пошту (необов'язково) > ")
-                    if name == "close" or "exit" or "good bye":
+                    if email == ("close" or "exit" or "good bye"):
                         break
                     res = add_contact(name, phone, birthday, address, email)
 
@@ -337,7 +337,7 @@ def main_customer_book():
                     name, old_phone = input(
                         "Введіть ім'я та старий номер телефону > ").lower().split()
                     new_phone = input("Введіть новий номер телефону > ")
-                    if (name or old_phone or new_phone) == "close" or "exit" or "good bye":
+                    if (name or old_phone or new_phone) == ("close" or "exit" or "good bye"):
                         break
                     res = change_phone(name, old_phone, new_phone)
                     if not res.startswith("Номер"):
@@ -350,7 +350,7 @@ def main_customer_book():
         elif command == "remove":
             while True:
                 name = input("Введіть ім'я > ")
-                if name == "close" or "exit" or "good bye":
+                if name == ("close" or "exit" or "good bye"):
                     break
                 res = remove_contact(name)
                 if not res.endswith("видалено."):
@@ -361,7 +361,7 @@ def main_customer_book():
         elif command == "phone":
             while True:
                 name = input("Введіть ім'я > ")
-                if name == "close" or "exit" or "good bye":
+                if name == ("close" or "exit" or "good bye"):
                     break
                 res = get_phone(name)
                 if not res.startswith("Номер"):
@@ -372,7 +372,7 @@ def main_customer_book():
         elif command == "next birthday":
             while True:
                 name = input("Введіть ім'я > ")
-                if name == "close" or "exit" or "good bye":
+                if name == ("close" or "exit" or "good bye"):
                     break
                 print(get_days_to_birthday(name))
         elif command == "birthday list":
