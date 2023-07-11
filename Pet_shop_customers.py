@@ -3,11 +3,13 @@ import os
 from sorter import sort_file
 from note_book import main_note_book
 from customer_book import main_customer_book
+from animation import anime_hello
 
 def main():
-    print('Вітаю!')
-    print('\n--------------- Menu ---------------')
+    #print('Вітаю!')
     while True:
+        anime_hello()
+        print('\n--------------- Menu ---------------')
         print('\nВи у головному меню!\nДоступні команди:')
         print('1 - Книга клієнтів\n2 - Нотатки\n3 - Сортувати файли\n4 - Вихід')
         command = input('Оберіть команду: ')

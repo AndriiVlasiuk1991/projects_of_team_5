@@ -35,7 +35,6 @@ def find_command(params):
     return "\n".join(f" {result}" for result in customer_book.search_by_content(params))        
 
 def main_note_book():
-    note_book = NoteBook()
     note_book.load_from_file()
     while True:
         print('\nДоступні команди:')
@@ -586,7 +585,8 @@ def main():
         else:
             print("Unknown command")
 
-
+note_book = NoteBook()
+    
 if __name__ == "__main__":
     #contacts = {}
     customer_book = CustomerBook()
