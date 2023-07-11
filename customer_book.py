@@ -281,7 +281,7 @@ def show_all_contacts():
     return result
 
 
-command_text = 'Hello, Add, Change, Remove, Phone, Next birthday, Birthday list, Search, Show all, Good bye, Close or Exit or Good bye'
+command_text = 'Hello, Add, Change, Remove, Phone, Next birthday, Birthday list, Search, Show all, Close or Exit or Good bye'
 
 
 def main_customer_book():
