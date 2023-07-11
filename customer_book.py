@@ -323,12 +323,11 @@ def main_customer_book():
                     if email == ("close" or "exit" or "good bye"):
                         break
                     res = add_contact(name, phone, birthday, address, email)
-
-                    if not res.startswith("Додано"):
-                        print(add_contact(name, phone, birthday, address, email))
-                    else:
-                        print(add_contact(name, phone, birthday, address, email))
+                    if res.startswith("Додано"):
+                        print(res)
                         break
+                    print(res)
+
                 except ValueError:
                     print("Непрвильні дані.")
         elif command == "change":
@@ -341,9 +340,9 @@ def main_customer_book():
                         break
                     res = change_phone(name, old_phone, new_phone)
                     if not res.startswith("Номер"):
-                        print(change_phone(name, old_phone, new_phone))
+                        print(res)
                     else:
-                        print(change_phone(name, old_phone, new_phone))
+                        print(res)
                         break
                 except ValueError:
                     print("Неправильні дані.")
@@ -354,9 +353,9 @@ def main_customer_book():
                     break
                 res = remove_contact(name)
                 if not res.endswith("видалено."):
-                    print(remove_contact(name))
+                    print(res)
                 else:
-                    print(remove_contact(name))
+                    print(res)
                     break
         elif command == "phone":
             while True:
@@ -365,9 +364,9 @@ def main_customer_book():
                     break
                 res = get_phone(name)
                 if not res.startswith("Номер"):
-                    print(get_phone(name))
+                    print(res)
                 else:
-                    print(get_phone(name))
+                    print(res)
                     break
         elif command == "next birthday":
             while True:
