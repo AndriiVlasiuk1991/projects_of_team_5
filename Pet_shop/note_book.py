@@ -64,7 +64,7 @@ def main_note_book():
             break
         else:
             print('Команда невідома')
-    note_book.save_to_file(os.path.join(os.getcwd(), "note_book.json"))
+    note_book.save_to_file(os.path.join(os.getcwd(), "Pet_shop/note_book.json"))
     return
     
 def note_find(params=''):
@@ -113,7 +113,7 @@ def note_edite():
     else:
         #note_book.load_from_file()
         note_book.edite_record(name)
-        #note_book.save_to_file(os.path.join(os.getcwd(), "note_book.json"))
+        #note_book.save_to_file(os.path.join(os.getcwd(), "Pet_shop/note_book.json"))
            
 def note_show_all(params=''):
     return note_book.show_all_records()
@@ -275,7 +275,7 @@ class NoteBook(UserDict):
             json.dump(data, file, default=str)
 
     def load_from_file(self):
-        file_path = os.path.join(os.getcwd(), "note_book.json")
+        file_path = os.path.join(os.getcwd(), "Pet_shop/note_book.json")
         if os.path.isfile(file_path):
             with open(file_path, 'r') as file:
                 data = json.load(file)
@@ -421,7 +421,7 @@ class CustomerBook(UserDict):
             json.dump(data, file, default=str)
 
     def load_from_file(self):
-        file_path = os.path.join(os.getcwd(), "customer_book.json")
+        file_path = os.path.join(os.getcwd(), "Pet_shop/customer_book.json")
         if os.path.isfile(file_path):
             with open(file_path, 'r') as file:
                 data = json.load(file)
@@ -571,8 +571,8 @@ def main():
     while True:
         user_input = input("> ").lower()
         if user_input in ["good bye", "close", "exit"]:
-            customer_book.save_to_file(os.path.join(os.getcwd(), "customer_book.json"))
-            note_book.save_to_file(os.path.join(os.getcwd(), "note_book.json"))
+            customer_book.save_to_file(os.path.join(os.getcwd(), "Pet_shop/customer_book.json"))
+            note_book.save_to_file(os.path.join(os.getcwd(), "Pet_shop/note_book.json"))
             print("Good bye!")
             break
         

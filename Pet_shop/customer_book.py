@@ -116,11 +116,11 @@ class CustomerBook:
             existing_record.phones.extend(record.phones)
         else:
             self.data[record.name.value] = record
-        self.save_to_file('customer_book.pkl')
+        self.save_to_file('Pet_shop/customer_book.pkl')
 
     def delete_record(self, name):
         del self.data[name]
-        self.save_to_file('customer_book.pkl')
+        self.save_to_file('Pet_shop/customer_book.pkl')
 
     def search_by_name(self, name):
         result = []
@@ -296,7 +296,7 @@ command_text = 'Hello, Add, Change, Remove, Phone, Next birthday, Birthday list,
 
 
 def main_customer_book():
-    customer_book.load_from_file('customer_book.pkl')
+    customer_book.load_from_file('Pet_shop/customer_book.pkl')
     print(f"\nДоступні команди: {command_text}")
     while True:
         command = input("\nВведіть команду  > ").lower()
@@ -330,6 +330,7 @@ def main_customer_book():
 
                 except ValueError:
                     print("Непрвильні дані.")
+            customer_book.save_to_file('Pet_shop/customer_book.pkl')
         elif command == "change":
             while True:
                 try:
@@ -348,6 +349,7 @@ def main_customer_book():
                         break
                 except ValueError:
                     print("Неправильні дані.")
+            customer_book.save_to_file('Pet_shop/customer_book.pkl')
         elif command == "remove":
             while True:
                 name = input("\nВведіть ім'я > ")
@@ -359,6 +361,7 @@ def main_customer_book():
                 else:
                     print(res)
                     break
+            customer_book.save_to_file('Pet_shop/customer_book.pkl')
         elif command == "phone":
             while True:
                 name = input("\nВведіть ім'я > ")
@@ -411,11 +414,11 @@ def main_customer_book():
         elif command == "show all":
             print(show_all_contacts())
         elif command == "good bye" or command == "close" or command == "exit":
+            customer_book.save_to_file('Pet_shop/customer_book.pkl')
             print("\nДо зустрічі!")
             break
         else:
             print(f"Невідома команда. Доступні команди: {command_text}")
-    customer_book.save_to_file('customer_book.pkl')
 
 
 if __name__ == "__main__":
