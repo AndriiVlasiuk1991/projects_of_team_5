@@ -297,15 +297,15 @@ command_text = 'Hello, Add, Change, Remove, Phone, Next birthday, Birthday list,
 
 def main_customer_book():
     customer_book.load_from_file('customer_book.pkl')
-    print(f"Доступні команди: {command_text}")
+    print(f"\nДоступні команди: {command_text}")
     while True:
-        command = input("Введіть команду  > ").lower()
+        command = input("\nВведіть команду  > ").lower()
         if command == "hello":
-            print(f"Чим я можу допомогти?")
+            print(f"\nЧим я можу допомогти?")
         elif command == "add":
             while True:
                 try:
-                    name = str(input("Введіть ім'я > "))
+                    name = str(input("\nВведіть ім'я > "))
                     if name == ("close" or "exit" or "good bye"):
                         break
                     phone = input("Введіть номер телефону > ")
@@ -334,9 +334,11 @@ def main_customer_book():
             while True:
                 try:
                     name, old_phone = input(
-                        "Введіть ім'я та старий номер телефону > ").lower().split()
+                        "\nВведіть ім'я та старий номер телефону > ").lower().split()
+                    if name == ("close" or "exit" or "good bye"):
+                        break
                     new_phone = input("Введіть новий номер телефону > ")
-                    if (name or old_phone or new_phone) == ("close" or "exit" or "good bye"):
+                    if new_phone == ("close" or "exit" or "good bye"):
                         break
                     res = change_phone(name, old_phone, new_phone)
                     if not res.startswith("Номер"):
@@ -348,7 +350,7 @@ def main_customer_book():
                     print("Неправильні дані.")
         elif command == "remove":
             while True:
-                name = input("Введіть ім'я > ")
+                name = input("\nВведіть ім'я > ")
                 if name == ("close" or "exit" or "good bye"):
                     break
                 res = remove_contact(name)
@@ -359,7 +361,7 @@ def main_customer_book():
                     break
         elif command == "phone":
             while True:
-                name = input("Введіть ім'я > ")
+                name = input("\nВведіть ім'я > ")
                 if name == ("close" or "exit" or "good bye"):
                     break
                 res = get_phone(name)
@@ -370,37 +372,46 @@ def main_customer_book():
                     break
         elif command == "next birthday":
             while True:
-                name = input("Введіть ім'я > ")
+                name = input("\nВведіть ім'я > ")
                 if name == ("close" or "exit" or "good bye"):
                     break
                 print(get_days_to_birthday(name))
+                break
         elif command == "birthday list":
-            num = input("Введіть кількість днів: ")
-            try:
-                days = int(num)
-                print(next_birthday(days))
-            except ValueError:
-                print("Кількість днів має бути цілим числом!")
+            while True:
+                num = input("\nВведіть кількість днів: ")
+                if num == ("close" or "exit" or "good bye"):
+                    break
+                try:
+                    days = int(num)
+                    print(next_birthday(days))
+                    break
+                except ValueError:
+                    print("Кількість днів має бути цілим числом!")
         elif command == "search":
-            inp = input(
-                "Введіть ім'я,номер телефону або адресу > ")
-            contacts = []
-            if inp.isdigit():
-                contacts = customer_book.search_by_phone(inp)
-            else:
-                contacts = customer_book.search_by_name(
-                    inp) + customer_book.search_by_address(inp)
-            if contacts:
-                result = "Результат:\n"
-                for record in contacts:
-                    result += str(record) + "\n"
-                print(result)
-            else:
-                print("Контакти не знайдено")
+            while True:
+                inp = input(
+                    "\nВведіть ім'я,номер телефону або адресу > ")
+                if inp == ("close" or "exit" or "good bye"):
+                    break
+                contacts = []
+                if inp.isdigit():
+                    contacts = customer_book.search_by_phone(inp)
+                else:
+                    contacts = customer_book.search_by_name(
+                        inp) + customer_book.search_by_address(inp)
+                if contacts:
+                    result = "Результат:\n"
+                    for record in contacts:
+                        result += str(record) + "\n"
+                    print(result)
+                    break
+                else:
+                    print("Контакти не знайдено")
         elif command == "show all":
             print(show_all_contacts())
         elif command == "good bye" or command == "close" or command == "exit":
-            print("До зустрічі!")
+            print("\nДо зустрічі!")
             break
         else:
             print(f"Невідома команда. Доступні команди: {command_text}")
