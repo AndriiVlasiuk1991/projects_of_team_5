@@ -1,17 +1,20 @@
 from datetime import datetime, timedelta
+from abc import abstractmethod, ABCMeta
 import pickle
 import os
 
 
-class Field:
+class Field(metaclass=ABCMeta):
     def __init__(self, value=None):
         self._value = value
 
     @property
+    @abstractmethod
     def value(self):
         return self._value
 
     @value.setter
+    @abstractmethod
     def value(self, new_value):
         self._value = new_value
 
