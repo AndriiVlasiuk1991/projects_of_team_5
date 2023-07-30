@@ -1,10 +1,14 @@
 import sys
 import os
+from flask import Flask
 from sorter import sort_file
 from note_book import main_note_book
 from customer_book import main_customer_book
 from animation import anime_hello
 
+app = Flask(__name__)
+
+@app.route('/')
 def main():
     #print('Вітаю!')
     while True:
@@ -39,6 +43,8 @@ def main():
 if __name__ == '__main__':
     if len(sys.argv) > 1:
         folder_name = sys.argv[1]
-        main()
+        # main()
+        app.run(debug=False, host='0.0.0.0')
     else:
-        main()
+        # main()
+        app.run(debug=False, host='0.0.0.0')
